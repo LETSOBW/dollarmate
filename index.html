@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trading Terminal | Deriv</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1><span class="ai-text">AI</span> Trading Terminal</h1>
+                <div class="symbol-indicator">
+                    <span id="current-symbol">R_100</span>
+                    <span id="current-price">--</span>
+                </div>
+            </div>
+            <div id="connection-status">
+                <span class="status-dot"></span>
+                <span>Disconnected</span>
+            </div>
+        </header>
+
+        <div class="main-grid">
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <div class="chart-controls">
+                    <select id="symbol-select" class="nice-select">
+                        <option value="R_100">Volatility 100 Index</option>
+                        <option value="R_75">Volatility 75 Index</option>
+                        <option value="R_50">Volatility 50 Index</option>
+                        <option value="1HZ100V">Bull/Bear 100</option>
+                        <option value="1HZ150V">Bull/Bear 150</option>
+                        <option value="1HZ250V">Bull/Bear 250</option>
+                        <option value="1HZ500V">Bull/Bear 500</option>
+                        <option value="RDBULL">Step Index</option>
+                        <option value="BOOM1000">Boom 1000</option>
+                        <option value="CRASH1000">Crash 1000</option>
+                    </select>
+                    <div class="timeframe-selector">
+                        <button class="timeframe-btn active" data-timeframe="60">1M</button>
+                        <button class="timeframe-btn" data-timeframe="300">5M</button>
+                        <button class="timeframe-btn" data-timeframe="900">15M</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="price-chart"></canvas>
+                    <div class="chart-annotations" id="chart-annotations"></div>
+                </div>
+                
+                <!-- Enhanced Pattern Detection -->
+                <div class="pattern-controls">
+                    <h3><i class="pattern-icon"></i> Pattern Detection</h3>
+                    <div class="pattern-toggles">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-engulfing" checked>
+                            <span class="slider"></span>
+                            <span>Engulfing</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-doji" checked>
+                            <span class="slider"></span>
+                            <span>Doji</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-triangle" checked>
+                            <span class="slider"></span>
+                            <span>Triangles</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-flags" checked>
+                            <span class="slider"></span>
+                            <span>Flags</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-headshoulders" checked>
+                            <span class="slider"></span>
+                            <span>Head & Shoulders</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade Panel -->
+            <div class="trade-panel">
+                <div class="panel-header">
+                    <h2><i class="trade-icon"></i> Trade Panel</h2>
+                    <div class="balance-display">
+                        <span>Balance:</span>
+                        <span id="account-balance">--</span>
+                    </div>
+                </div>
+                
+                <div id="auth-section">
+                    <input type="password" id="api-token" placeholder="Enter Deriv API Token">
+                    <button id="connect-btn" class="btn-primary">Connect</button>
+                </div>
+
+                <div id="trade-form" class="hidden">
+                    <div class="form-group">
+                        <label>Contract Type</label>
+                        <div class="contract-type-selector">
+                            <button class="contract-btn active" data-type="CALL">CALL</button>
+                            <button class="contract-btn" data-type="PUT">PUT</button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Duration</label>
+                            <div class="duration-input">
+                                <input type="number" id="duration" value="5" min="1">
+                                <select id="duration-unit">
+                                    <option value="m">Minutes</option>
+                                    <option value="s">Seconds</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount (USD)</label>
+                            <input type="number" id="amount" value="10" min="1">
+                        </div>
+                    </div>
+
+                    <button id="place-trade-btn" class="btn-primary">Buy Contract</button>
+                    <div id="trade-result"></div>
+                </div>
+
+                <div class="positions-section">
+                    <div class="section-header">
+                        <h3><i class="positions-icon"></i> Open Positions</h3>
+                        <button id="refresh-positions"><i class="refresh-icon"></i></button>
+                    </div>
+                    <div id="positions-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI and Strategy Panels -->
+        <div class="secondary-grid">
+            <!-- AI Panel -->
+            <div class="ai-panel">
+                <div class="panel-header">
+                    <h2><i class="ai-icon"></i> AI Prediction Engine</h2>
+                    <div class="model-selector">
+                        <select id="model-select">
+                            <option value="lstm">LSTM</option>
+                            <option value="xgboost">XGBoost</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="ai-controls">
+                    <button id="train-btn" class="btn-secondary">Train Model</button>
+                    <button id="predict-btn" class="btn-primary">Get Prediction</button>
+                </div>
+                
+                <div class="prediction-result">
+                    <div class="prediction-direction">
+                        <span id="prediction-arrow">→</span>
+                        <span id="prediction-text">Neutral</span>
+                    </div>
+                    <div class="confidence-meter">
+                        <div class="meter-bar" style="width: 50%"></div>
+                        <span id="confidence-value">50% confidence</span>
+                    </div>
+                </div>
+                
+                <div class="backtest-section">
+                    <h4>Backtest Results</h4>
+                    <canvas id="backtest-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Risk Management -->
+            <div class="risk-panel">
+                <div class="panel-header">
+                    <h2><i class="risk-icon"></i> Risk Management</h2>
+                </div>
+                
+                <div class="risk-controls">
+                    <div class="form-group">
+                        <label>Risk Percentage</label>
+                        <input type="range" id="risk-slider" min="0.5" max="5" step="0.5" value="2">
+                        <div class="slider-labels">
+                            <span>0.5%</span>
+                            <span id="risk-value">2%</span>
+                            <span>5%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Stop Loss (pips)</label>
+                        <input type="number" id="stop-loss" value="30" min="1">
+                    </div>
+                    
+                    <div class="position-size-display">
+                        <div class="size-value" id="position-size">$0</div>
+                        <div class="size-label">Recommended Position</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load required libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.deriv.com/deriv-api/v1.0.0/api.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
